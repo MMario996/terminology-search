@@ -1,0 +1,72 @@
+{
+  "timeZone": "Europe/Berlin",
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "webapp": {
+    "executeAs": "USER_ACCESSING",
+    "access": "DOMAIN"
+  },
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/script.external_request",
+    "https://www.googleapis.com/auth/script.send_mail",
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/documents.currentonly",
+    "https://www.googleapis.com/auth/spreadsheets.currentonly",
+    "https://www.googleapis.com/auth/presentations.currentonly",
+    "https://www.googleapis.com/auth/drive",
+    "https://www.googleapis.com/auth/drive.readonly",
+    "https://www.googleapis.com/auth/script.container.ui"
+  ],
+  "urlFetchWhitelist": [
+    "https://cloud.memsource.com/",
+    "https://34-111-99-134.nip.io/",
+    "https://script.googleapis.com/"
+  ],
+  "addOns": {
+    "common": {
+      "name": "K?rcher TermCheck",
+      "logoUrl": "https://www.gstatic.com/images/branding/product/2x/apps_script_48dp.png",
+      "layoutProperties": {
+        "primaryColor": "#FFED00",
+        "secondaryColor": "#3A3A3A"
+      },
+      "homepageTrigger": {
+        "runFunction": "onHomepage",
+        "enabled": true
+      }
+    },
+    "docs": {
+      "homepageTrigger": {
+        "runFunction": "onHomepage",
+        "enabled": true
+      }
+    },
+    "sheets": {
+      "homepageTrigger": {
+        "runFunction": "onHomepage",
+        "enabled": true
+      }
+    },
+    "slides": {
+      "homepageTrigger": {
+        "runFunction": "onHomepage",
+        "enabled": true
+      }
+    }
+  },
+  "dependencies": {
+    "enabledAdvancedServices": [
+      {
+        "userSymbol": "Drive",
+        "version": "v3",
+        "serviceId": "drive"
+      },
+      {
+        "userSymbol": "Sheets",
+        "version": "v4",
+        "serviceId": "sheets"
+      }
+    ]
+  }
+}
