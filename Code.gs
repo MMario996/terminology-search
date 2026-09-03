@@ -21,8 +21,8 @@ function apiGetContext() {
   var token  = (props.getProperty('PHRASE_API_TOKEN') || '').trim();
   var geminiKey = (props.getProperty('GEMINI_API_KEY') || '').trim();
   var role = getUserRole_(caller);
-  var isRulesOnly = userProps.getProperty('AUTHORCHECK_IS_RULES_ONLY') === 'true';
-
+    var isRulesOnly = userProps.getProperty('AUTHORCHECK_IS_RULES_ONLY') === 'true';
+  var rulesHelpSeen = userProps.getProperty('AUTHORCHECK_RULES_HELP_SEEN') === 'true';
   return {
     email:           caller,
     role:            role,
@@ -30,6 +30,7 @@ function apiGetContext() {
     phraseConnected: token.length > 10,
     aiEnabled:       geminiKey.length > 10,
     isRulesOnly:     isRulesOnly,
+    rulesHelpSeen:   rulesHelpSeen,
     templates: {
       LLM: { uid: props.getProperty('TEMPLATE_LLM') || 'pNoERiZ1YTileyUe4Za1j6', name: '[AKW] Terminology check [MT+Review LLM]' },
       ALG: { uid: props.getProperty('TEMPLATE_ALG') || 'arpmvYCEAqGl0OmKV9f3s3', name: '[AKW] Terminology check [MT+Review ALG]' }
