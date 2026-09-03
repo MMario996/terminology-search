@@ -20,49 +20,54 @@ const AUTHORCHECK_DEFAULT_PROMPT =
 '- Gib nur echte Fehler zur?ck, basierend auf den Vorgaben. Wenn keine Fehler gefunden werden, gib {"issues":[]} zur?ck.';
 
 // ??? ANSICHTEN: CHECKS IN DER SEITENLEISTE / RULES IM POPUP ???????????????
-function showAuthorCheckSidebar() {
+function showAuthorCheckSidebar(e) {
   PropertiesService.getUserProperties().deleteProperty('AUTHORCHECK_IS_RULES_ONLY');
   var ui = HtmlService.createHtmlOutputFromFile('AuthorCheck')
     .setTitle('K?rcher Author Check')
     .setWidth(350);
 
-  _getUiSafe_().showSidebar(ui);
+  _getUiSafe_(e).showSidebar(ui);
 }
 
-function apiOpenRulesModal() {
+function apiOpenRulesModal(e) {
   PropertiesService.getUserProperties().setProperty('AUTHORCHECK_IS_RULES_ONLY', 'true');
   var ui = HtmlService.createHtmlOutputFromFile('AuthorCheck')
     .setTitle('Rules & Custom Prompts')
-    .setWidth(1100)
-    .setHeight(800);
+    .setWidth(1350)
+    .setHeight(900);
 
-  _getUiSafe_().showModalDialog(ui, 'Rules & Custom Prompts');
+  _getUiSafe_(e).showModalDialog(ui, 'Rules & Custom Prompts');
 }
 
 /**
  * Hilfsfunktion: Ermittelt sicher das UI f?r Docs, Sheets oder Slides
  * ohne Permission-Exceptions abzuwerfen.
+ * @param {Object} e Das Event-Objekt der Card-Action (enth?lt hostApp/docs/sheets/slides)
  */
-function _getUiSafe_() {
-  try {
-    if (typeof DocumentApp !== 'undefined' && DocumentApp.getActiveDocument()) {
-      return DocumentApp.getUi();
-    }
-  } catch (e) {}
+function _getUiSafe_(e) {
+  var hostApp = e && (e.hostApp || (e.docs && 'docs') || (e.sheets && 'sheets') || (e.slides && 'slides'));
 
   try {
-    if (typeof SpreadsheetApp !== 'undefined' && SpreadsheetApp.getActiveSpreadsheet()) {
-      return SpreadsheetApp.getUi();
-    }
-  } catch (e) {}
+    if (hostApp === 'docs') return DocumentApp.getUi();
+    if (hostApp === 'sheets') return SpreadsheetApp.getUi();
+    if (hostApp === 'slides') return SlidesApp.getUi();
+  } catch (err) {
+    Logger.log('_getUiSafe_: getUi() ueber hostApp "' + hostApp + '" fehlgeschlagen: ' + err);
+  }
 
   try {
-    if (typeof SlidesApp !== 'undefined' && SlidesApp.getActivePresentation()) {
-      return SlidesApp.getUi();
-    }
-  } catch (e) {}
+    if (typeof DocumentApp !== 'undefined' && DocumentApp.getActiveDocument()) return DocumentApp.getUi();
+  } catch (err) { Logger.log('_getUiSafe_: Docs Fallback fehlgeschlagen: ' + err); }
 
-  throw new Error("Could not determine active Workspace App UI.");
+  try {
+    if (typeof SpreadsheetApp !== 'undefined' && SpreadsheetApp.getActiveSpreadsheet()) return SpreadsheetApp.getUi();
+  } catch (err) { Logger.log('_getUiSafe_: Sheets Fallback fehlgeschlagen: ' + err); }
+
+  try {
+    if (typeof SlidesApp !== 'undefined' && SlidesApp.getActivePresentation()) return SlidesApp.getUi();
+  } catch (err) { Logger.log('_getUiSafe_: Slides Fallback fehlgeschlagen: ' + err); }
+
+  throw new Error('Could not determine active Workspace App UI. hostApp=' + hostApp);
 }
 
 // ??? GLOSSAR AUS DEN TERMBASES BAUEN ???????????????????????????????????????
@@ -328,10 +333,11 @@ function apiCommentIssue(originalText, suggestion, explanation) {
         var docId = doc.getId();
         Drive.Comments.create({ 
           content: commentText, 
-          context: { type: 'text/html', value: cleanOriginal } 
+          context: { type: 'text/plain', value: cleanOriginal } 
         }, docId, {fields: '*'});
         return true;
       } catch(e) { 
+        Logger.log('apiCommentIssue: Drive.Comments.create fehlgeschlagen: ' + e);
         return true; // Auswertung/Selektion hat geklappt, selbst wenn Drive Comments offline sind
       }
     }
@@ -345,8 +351,9 @@ function apiCommentIssue(originalText, suggestion, explanation) {
       found.setNote(commentText);
       return true; 
     }
-  } else if (SlidesApp.getActivePresentation()) {
-    var slides = SlidesApp.getActivePresentation().getSlides();
+    } else if (SlidesApp.getActivePresentation()) {
+    var pres = SlidesApp.getActivePresentation();
+    var slides = pres.getSlides();
     for (var i = 0; i < slides.length; i++) {
       var shapes = slides[i].getShapes();
       for (var j = 0; j < shapes.length; j++) {
@@ -355,6 +362,15 @@ function apiCommentIssue(originalText, suggestion, explanation) {
           if (txt.indexOf(originalText) !== -1 || txt.indexOf(cleanOriginal) !== -1) {
             slides[i].selectAsCurrentPage();
             shapes[j].select();
+
+            try {
+              Drive.Comments.create({
+                content: commentText,
+                context: { type: 'text/plain', value: cleanOriginal }
+              }, pres.getId(), {fields: '*'});
+            } catch (e) {
+              Logger.log('apiCommentIssue (Slides): Drive.Comments.create fehlgeschlagen: ' + e);
+            }
             return true;
           }
         }
@@ -365,8 +381,10 @@ function apiCommentIssue(originalText, suggestion, explanation) {
 }
 
 function apiBackToHomepage() {
-  // L?dt die Homepage-Karte
-  return onHomepage();
+  // Hinweis: Aus einer HtmlService-Seitenleiste heraus kann keine CardService-Homepage
+  // "nachgeladen" werden, das unterst?tzt die Plattform nicht. Diese Funktion schlie?t
+  // daher nur die Seitenleiste (siehe backToHomepage() im Client).
+  return true;
 }
 
 /**
