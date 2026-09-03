@@ -39,6 +39,11 @@ function apiOpenRulesModal(e) {
   _getUiSafe_(e).showModalDialog(ui, 'Rules & Custom Prompts');
 }
 
+function apiMarkRulesHelpSeen() {
+  PropertiesService.getUserProperties().setProperty('AUTHORCHECK_RULES_HELP_SEEN', 'true');
+  return true;
+}
+
 /**
  * Hilfsfunktion: Ermittelt sicher das UI f?r Docs, Sheets oder Slides
  * ohne Permission-Exceptions abzuwerfen.
@@ -295,14 +300,27 @@ function apiJumpToIssue(searchText) {
     var found = sheet.createTextFinder(searchText).findNext();
     if (found) { found.activate(); return true; }
   } else if (SlidesApp.getActivePresentation()) {
-    var slides = SlidesApp.getActivePresentation().getSlides();
+    var pres = SlidesApp.getActivePresentation();
+    var slides = pres.getSlides();
     for (var i = 0; i < slides.length; i++) {
       var shapes = slides[i].getShapes();
       for (var j = 0; j < shapes.length; j++) {
-        if (shapes[j].getShapeType() === SlidesApp.ShapeType.TEXT_BOX && shapes[j].getText().asString().indexOf(searchText) !== -1) {
-          slides[i].selectAsCurrentPage();
-          shapes[j].select();
-          return true;
+        if (shapes[j].getShapeType() === SlidesApp.ShapeType.TEXT_BOX) {
+          var txt = shapes[j].getText().asString();
+          if (txt.indexOf(originalText) !== -1 || txt.indexOf(cleanOriginal) !== -1) {
+            slides[i].selectAsCurrentPage();
+            shapes[j].select();
+
+            try {
+              Drive.Comments.create({
+                content: commentText,
+                context: { type: 'text/plain', value: cleanOriginal }
+              }, pres.getId(), {fields: '*'});
+            } catch (e) {
+              Logger.log('apiCommentIssue (Slides): Drive.Comments.create fehlgeschlagen: ' + e);
+            }
+            return true;
+          }
         }
       }
     }
@@ -351,9 +369,8 @@ function apiCommentIssue(originalText, suggestion, explanation) {
       found.setNote(commentText);
       return true; 
     }
-    } else if (SlidesApp.getActivePresentation()) {
-    var pres = SlidesApp.getActivePresentation();
-    var slides = pres.getSlides();
+  } else if (SlidesApp.getActivePresentation()) {
+    var slides = SlidesApp.getActivePresentation().getSlides();
     for (var i = 0; i < slides.length; i++) {
       var shapes = slides[i].getShapes();
       for (var j = 0; j < shapes.length; j++) {
@@ -362,15 +379,6 @@ function apiCommentIssue(originalText, suggestion, explanation) {
           if (txt.indexOf(originalText) !== -1 || txt.indexOf(cleanOriginal) !== -1) {
             slides[i].selectAsCurrentPage();
             shapes[j].select();
-
-            try {
-              Drive.Comments.create({
-                content: commentText,
-                context: { type: 'text/plain', value: cleanOriginal }
-              }, pres.getId(), {fields: '*'});
-            } catch (e) {
-              Logger.log('apiCommentIssue (Slides): Drive.Comments.create fehlgeschlagen: ' + e);
-            }
             return true;
           }
         }
@@ -381,9 +389,6 @@ function apiCommentIssue(originalText, suggestion, explanation) {
 }
 
 function apiBackToHomepage() {
-  // Hinweis: Aus einer HtmlService-Seitenleiste heraus kann keine CardService-Homepage
-  // "nachgeladen" werden, das unterst?tzt die Plattform nicht. Diese Funktion schlie?t
-  // daher nur die Seitenleiste (siehe backToHomepage() im Client).
   return true;
 }
 
