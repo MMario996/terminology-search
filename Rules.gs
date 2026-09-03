@@ -5998,12 +5998,24 @@
     }
   ];
 
+/**
+ * Hilfsfunktion: Holt oder erstellt den Ordner "TermCheck Rules" in Google Drive.
+ */
+function _getOrCreateRulesFolder_() {
+  var folders = DriveApp.getFoldersByName("TermCheck Rules");
+  if (folders.hasNext()) {
+    return folders.next();
+  } else {
+    return DriveApp.createFolder("TermCheck Rules");
+  }
+}
+
 function apiGetRulesConfig() {
-  var props = PropertiesService.getUserProperties(); // Speichert die Einstellungen pro Nutzer
+  var props = PropertiesService.getUserProperties();
   var overridesStr = props.getProperty('AUTHORCHECK_RULES');
   var overrides = overridesStr ? JSON.parse(overridesStr) : {};
 
-  return DEFAULT_RULES_CONFIG.map(function(rule) {
+  var config = DEFAULT_RULES_CONFIG.map(function(rule) {
     var r = Object.assign({}, rule);
     if (overrides[r.Name]) {
       r.IsEnabled = overrides[r.Name].IsEnabled;
@@ -6013,13 +6025,33 @@ function apiGetRulesConfig() {
     }
     return r;
   });
+
+  // Zus?tzlich benutzerdefinierte Regeln aus der Drive-JSON laden
+  try {
+    var folder = _getOrCreateRulesFolder_();
+    var files = folder.getFilesByName("active_rules.json");
+    if (files.hasNext()) {
+      var file = files.next();
+      var driveRules = JSON.parse(file.getBlob().getDataAsString());
+      if (Array.isArray(driveRules)) {
+        driveRules.forEach(function(dr) {
+          if (dr.Name && dr.Name.indexOf("CUSTOM_") === 0) {
+            config.push(dr);
+          }
+        });
+      }
+    }
+  } catch(e) {
+    console.warn("Konnte Drive-Regeln nicht auslesen: " + e.message);
+  }
+
+  return config;
 }
 
 function apiSaveRulesConfig(updatedRules) {
   var props = PropertiesService.getUserProperties();
   var overrides = {};
   
-  // Wir speichern nur die Regeln, die vom Default abweichen, um Speicherplatz zu sparen
   updatedRules.forEach(function(rule) {
     overrides[rule.Name] = {
       IsEnabled: rule.IsEnabled,
@@ -6028,5 +6060,28 @@ function apiSaveRulesConfig(updatedRules) {
   });
   
   props.setProperty('AUTHORCHECK_RULES', JSON.stringify(overrides));
+
+  // Gleichzeitig in Drive den Ordner sicherstellen und active_rules.json ?berschreiben
+  apiExportRulesToDrive(updatedRules);
+  return { success: true };
+}
+
+/**
+ * Speichert die Regeln als JSON in den Drive-Ordner "TermCheck Rules".
+ * Existiert die Datei bereits, wird sie ?berschrieben.
+ */
+function apiExportRulesToDrive(rules) {
+  var folder = _getOrCreateRulesFolder_();
+  var fileName = "active_rules.json";
+  var jsonContent = JSON.stringify(rules, null, 2);
+
+  var existingFiles = folder.getFilesByName(fileName);
+  if (existingFiles.hasNext()) {
+    var file = existingFiles.next();
+    file.setContent(jsonContent);
+  } else {
+    folder.createFile(fileName, jsonContent, MimeType.PLAIN_TEXT);
+  }
+
   return { success: true };
 }
