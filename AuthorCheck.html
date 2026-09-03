@@ -25,85 +25,126 @@
   --ease: cubic-bezier(.16,1,.3,1);
 }
 *, *::before, *::after{ box-sizing:border-box; margin:0; padding:0; }
-html,body{ background:var(--white); color:var(--ink); font-family:var(--ff-body); font-size:13px; -webkit-font-smoothing:antialiased; }
-button, select{ font-family:inherit; }
+html,body{ background:var(--white); color:var(--ink); font-family:var(--ff-body); font-size:17px; -webkit-font-smoothing:antialiased; }
+button, select, input, textarea{ font-family:inherit; }
+#app{ padding:20px; }
+.header{ margin-bottom:16px; }
+.header h1{ font-family:var(--ff-head); font-size:20px; font-weight:600; letter-spacing:.5px; text-transform:uppercase; color:var(--ink); }
+.header p{ font-size:14px; color:var(--gray-500); margin-top:4px; line-height:1.4; }
 
-#app{ padding:14px; }
+/* Responsive Header Buttons */
+.header-nav { display:flex; align-items:center; gap:4px; flex-shrink:0; }
+.header-btn {
+  display:flex; align-items:center; justify-content:center; gap:4px;
+  background:var(--gray-50); border:1px solid var(--gray-300);
+  padding:5px 7px; cursor:pointer; color:var(--gray-600);
+  font-family:var(--ff-head); font-size:11px; font-weight:600; text-transform:uppercase;
+  white-space:nowrap; transition:all .15s;
+}
+.header-btn:hover { background:var(--gray-100); border-color:var(--ink); color:var(--ink); }
+.header-btn svg { width:14px; height:14px; flex-shrink:0; }
 
-.header{ margin-bottom:12px; }
-.header h1{ font-family:var(--ff-head); font-size:15px; font-weight:600; letter-spacing:.4px; text-transform:uppercase; color:var(--ink); }
-.header p{ font-size:11.5px; color:var(--gray-500); margin-top:3px; line-height:1.4; }
-
-.control-row{ display:flex; gap:8px; margin-bottom:10px; }
-.control-row label{ display:flex; align-items:center; font-family:var(--ff-head); font-size:10.5px; font-weight:600; letter-spacing:.5px; text-transform:uppercase; color:var(--gray-500); white-space:nowrap; }
+/* Spezielle Anpassungen f?r die schmale Seitenleiste (Sidebar) */
+@media (max-width: 450px) {
+  html, body { font-size: 15px; } /* Schriftart um 2 Punkte kleiner */
+  .header h1 { font-size: 18px; }
+  .header p { font-size: 13px; }
+  .control-row label { font-size: 13px; }
+  #lang-select { font-size: 15px; }
+  .btn-check { font-size: 15px; padding: 12px; }
+  .summary-bar { font-size: 13px; }
+  .btn-bulk { font-size: 12px; padding: 5px 8px; }
+  .type-badge { font-size: 11px; }
+  .diff-line { font-size: 15px; }
+  .issue-explanation { font-size: 13.5px; }
+  .btn-mini { font-size: 12px; padding: 6px 8px; }
+  
+  /* Header-Buttons kompakt halten */
+  .header-btn span { display: none; }
+  .header-btn { padding: 6px; }
+}
+.control-row{ display:flex; gap:12px; margin-bottom:14px; }
+.control-row label{ display:flex; align-items:center; font-family:var(--ff-head); font-size:15px; font-weight:600; letter-spacing:.5px; text-transform:uppercase; color:var(--gray-500); white-space:nowrap; }
 #lang-select{
   flex:1; border:1.5px solid var(--gray-300); background:var(--white);
-  padding:7px 9px; font-size:12.5px; color:var(--ink); cursor:pointer; outline:none;
+  padding:10px 12px; font-size:17px; color:var(--ink); cursor:pointer; outline:none;
 }
 #lang-select:focus{ border-color:var(--ink); }
-
 .btn-check{
-  width:100%; display:flex; align-items:center; justify-content:center; gap:8px;
+  width:100%; display:flex; align-items:center; justify-content:center; gap:10px;
   background:var(--yellow); color:var(--ink); border:none; cursor:pointer;
-  padding:11px; font-family:var(--ff-head); font-size:12.5px; font-weight:600;
-  letter-spacing:.7px; text-transform:uppercase; transition:background .15s;
-  margin-bottom:12px;
+  padding:14px; font-family:var(--ff-head); font-size:17px; font-weight:600;
+  letter-spacing:.8px; text-transform:uppercase; transition:background .15s;
+  margin-bottom:16px;
 }
 .btn-check:hover{ background:var(--yellow-dim); }
 .btn-check:disabled{ opacity:.5; cursor:not-allowed; }
-.btn-check svg{ width:15px; height:15px; }
-
-.ai-disabled-note{ text-align:center; padding:30px 10px; color:var(--gray-400); font-size:12px; line-height:1.5; }
-
+.btn-check svg{ width:20px; height:20px; }
+.ai-disabled-note{ text-align:center; padding:40px 14px; color:var(--gray-400); font-size:16px; line-height:1.5; }
 .summary-bar{
   display:flex; align-items:center; justify-content:space-between; gap:10px;
-  font-family:var(--ff-head); font-size:10.5px; font-weight:600; letter-spacing:.6px;
+  font-family:var(--ff-head); font-size:15px; font-weight:600; letter-spacing:.6px;
   text-transform:uppercase; color:var(--gray-500);
-  padding:8px 0; border-bottom:1px solid var(--gray-150); margin-bottom:10px;
+  padding:10px 0; border-bottom:1px solid var(--gray-150); margin-bottom:14px; flex-wrap:wrap;
 }
 .summary-bar b{ color:var(--ink); }
-.btn-apply-all{
-  background:var(--white); border:1.5px solid var(--ink); padding:5px 10px; cursor:pointer;
-  font-family:var(--ff-head); font-size:10px; font-weight:600; letter-spacing:.5px; text-transform:uppercase; color:var(--ink);
+.bulk-actions{ 
+  display: flex; 
+  flex-wrap: wrap; 
+  gap: 4px; 
+  width: 100%;
 }
-.btn-apply-all:hover{ background:var(--ink); color:var(--yellow); }
-.btn-apply-all:disabled{ opacity:.4; cursor:not-allowed; }
-
-.loading-state{ display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 10px; }
-.loading-text{ font-family:var(--ff-head); font-size:11.5px; font-weight:600; letter-spacing:.4px; color:var(--gray-500); text-align:center; }
-
+.btn-bulk{
+  flex: 1 1 calc(50% - 4px); /* Ordnet die 4 Buttons sauber in 2 Zeilen ? 2 Buttons an */
+  background:var(--white); 
+  border:1.5px solid var(--ink); 
+  padding:5px 4px; 
+  cursor:pointer;
+  font-family:var(--ff-head); 
+  font-size:11px; 
+  font-weight:600; 
+  letter-spacing:.3px; 
+  text-transform:uppercase; 
+  color:var(--ink);
+  text-align: center;
+  white-space: nowrap;
+}
+.btn-bulk:hover{ background:var(--ink); color:var(--yellow); }
+.btn-bulk:disabled{ opacity:.4; cursor:not-allowed; }
+.loading-state{ display:flex; flex-direction:column; align-items:center; justify-content:center; padding:50px 14px; }
+.loading-text{ font-family:var(--ff-head); font-size:16px; font-weight:600; letter-spacing:.4px; color:var(--gray-500); text-align:center; }
 .issue-card{
-  border:1px solid var(--gray-200); margin-bottom:8px; background:var(--white);
+  border:1px solid var(--gray-200); margin-bottom:12px; background:var(--white);
   opacity:0; transform:translateY(6px); animation:cardIn .3s var(--ease) forwards;
 }
 @keyframes cardIn{ to{ opacity:1; transform:none; } }
-.issue-head{ display:flex; align-items:center; gap:7px; padding:8px 10px; background:var(--gray-50); border-bottom:1px solid var(--gray-150); }
+.issue-head{ display:flex; align-items:center; gap:10px; padding:10px 14px; background:var(--gray-50); border-bottom:1px solid var(--gray-150); }
 .type-badge{
-  font-family:var(--ff-head); font-size:9px; font-weight:700; letter-spacing:.5px; text-transform:uppercase;
-  padding:2px 7px; flex-shrink:0;
+  font-family:var(--ff-head); font-size:13px; font-weight:700; letter-spacing:.5px; text-transform:uppercase;
+  padding:3px 9px; flex-shrink:0;
 }
 .type-badge.terminology{ background:var(--yellow); color:var(--ink); }
 .type-badge.grammar{ background:var(--gray-200); color:var(--gray-600); }
 .type-badge.style { background:var(--ink); color:var(--yellow); }
-.issue-dismiss{ margin-left:auto; background:none; border:none; cursor:pointer; color:var(--gray-400); padding:2px; display:flex; }
+.issue-dismiss{ margin-left:auto; background:none; border:none; cursor:pointer; color:var(--gray-400); padding:4px; display:flex; }
 .issue-dismiss:hover{ color:var(--red); }
-.issue-dismiss svg{ width:13px; height:13px; }
-
-.issue-body{ padding:9px 10px; }
-.diff-line{ font-size:13px; line-height:1.5; margin-bottom:5px; word-break:break-word; }
-.diff-original{ color:var(--red); text-decoration:line-through; text-decoration-thickness:1.3px; }
-.diff-arrow{ color:var(--gray-400); margin:0 4px; }
+.issue-dismiss svg{ width:18px; height:18px; }
+.issue-body{ padding:14px; }
+.diff-line{ font-size:18px; line-height:1.5; margin-bottom:8px; word-break:break-word; }
+.diff-original{ color:var(--red); text-decoration:line-through; text-decoration-thickness:1.5px; }
+.diff-arrow{ color:var(--gray-400); margin:0 6px; }
 .diff-suggestion{ color:var(--ink); font-weight:600; }
-.issue-explanation{ font-size:11.5px; color:var(--gray-500); line-height:1.45; margin-bottom:9px; }
-
-.issue-actions{ display:flex; gap:7px; }
+.issue-explanation{ font-size:15.5px; color:var(--gray-500); line-height:1.5; margin-bottom:12px; }
+.issue-actions{ display:flex; flex-wrap:wrap; gap:8px; }
 .btn-mini{
-  flex:1; display:flex; align-items:center; justify-content:center; gap:5px;
+  flex: 1 1 calc(25% - 8px);
+  min-width: 110px;
+  display:flex; align-items:center; justify-content:center; gap:6px;
   border:1.5px solid var(--gray-300); background:var(--white); cursor:pointer;
-  padding:7px; font-family:var(--ff-head); font-size:10.5px; font-weight:600;
+  padding:8px 12px; font-family:var(--ff-head); font-size:14px; font-weight:600;
   letter-spacing:.5px; text-transform:uppercase; color:var(--ink); transition:all .15s;
 }
-.btn-mini svg{ width:12px; height:12px; }
+.btn-mini svg{ width:11px; height:11px; }
 .btn-mini.primary{ background:var(--yellow); border-color:var(--yellow); }
 .btn-mini.primary:hover{ background:var(--yellow-dim); }
 .btn-mini.ghost:hover{ border-color:var(--ink); }
@@ -112,28 +153,25 @@ button, select{ font-family:inherit; }
 .issue-card.applied .btn-mini{ pointer-events:none; }
 .applied-tag{ font-family:var(--ff-head); font-size:10px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; color:var(--green); display:flex; align-items:center; gap:4px; }
 .applied-tag svg{ width:12px; height:12px; }
-
 .state-box{ text-align:center; padding:34px 14px; }
 .state-icon-wrap{ display:flex; justify-content:center; margin-bottom:10px; }
 .state-icon-wrap svg{ width:36px; height:36px; }
 .state-title{ font-family:var(--ff-head); font-size:12.5px; font-weight:600; letter-spacing:.5px; text-transform:uppercase; color:var(--ink); margin-bottom:4px; }
 .state-sub{ font-size:11.5px; color:var(--gray-500); line-height:1.5; }
-
 #toast{
-  position:fixed; left:50%; bottom:16px; transform:translateX(-50%) translateY(10px);
+  position:fixed; left:50%; bottom:20px; transform:translateX(-50%) translateY(10px);
   background:var(--ink); color:var(--yellow); font-family:var(--ff-head);
-  font-size:10.5px; font-weight:600; letter-spacing:.5px; text-transform:uppercase;
-  padding:8px 14px; opacity:0; pointer-events:none; transition:opacity .2s var(--ease), transform .2s var(--ease); z-index:100; max-width:90%; text-align:center;
+  font-size:13px; font-weight:600; letter-spacing:.6px; text-transform:uppercase;
+  padding:10px 18px; opacity:0; pointer-events:none; transition:opacity .2s var(--ease), transform .2s var(--ease); 
+  z-index:10000; max-width:90%; text-align:center; box-shadow:0 4px 15px rgba(0,0,0,0.3); border:1px solid var(--yellow);
 }
 #toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
-
 /* Settings Gear & Modal */
 #settingsGear {
   position:absolute; top:12px; right:14px; background:none; border:none; cursor:pointer; color:var(--gray-400); padding:4px;
 }
 #settingsGear:hover { color:var(--ink); }
 #settingsGear svg { width:18px; height:18px; }
-
 .modal-bg { display:none; position:fixed; inset:0; background:rgba(58,58,58,.5); z-index:200; padding:15px; }
 .modal-bg.open { display:flex; flex-direction:column; justify-content:center; }
 .modal { background:var(--white); border:1px solid var(--gray-200); max-height:90vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.1); }
@@ -141,8 +179,7 @@ button, select{ font-family:inherit; }
 .modal-head h2 { font-family:var(--ff-head); font-size:14px; text-transform:uppercase; letter-spacing:.5px; }
 .modal-close { background:none; border:none; cursor:pointer; padding:4px; color:var(--gray-500); }
 .modal-body { padding:14px; overflow-y:auto; flex:1; }
-.modal-foot { padding:10px 14px; border-top:1px solid var(--gray-150); display:flex; justify-content:flex-end; }
-
+.modal-foot { padding:10px 14px; border-top:1px solid var(--gray-150); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
 .rule-group { margin-bottom: 12px; border: 1px solid var(--gray-200); background: var(--white); }
 .rule-group-header { display: flex; justify-content: space-between; align-items: center; background: var(--gray-50); padding: 10px 12px; cursor: pointer; user-select: none; }
 .rule-group-header h3 { font-family:var(--ff-head); font-size:12px; color:var(--ink); text-transform:uppercase; margin:0; }
@@ -155,74 +192,130 @@ button, select{ font-family:inherit; }
 .rule-item label { font-size:11px; color:var(--gray-600); display:flex; align-items:center; gap:8px; cursor:pointer; flex:1; }
 .rule-item input[type="checkbox"] { cursor:pointer; }
 .rule-item select { font-size:11px; padding:2px 4px; border:1px solid var(--gray-300); background:var(--white); margin-left:10px;}
-
 </style>
 </head>
 <body>
-
 <div id="app">
-  <div class="header">
-    <h1>Autoren-Check</h1>
-    <p>Pr?ft den aktuellen Doc/Sheet/Slide-Text auf Grammatik- und K?rcher-Terminologiefehler.</p>
-  </div>
+  <div class="header" style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+    <div>
+      <h1>Author Check</h1>
+      <p>Check active text for grammar, terminology, and custom style rules.</p>
+    </div>
+    <div class="header-nav">
+      <button class="header-btn" onclick="toggleViewMode()" title="Switch view (Modal/Sidebar)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M15 3v18"/>
+        </svg>
+        <span>View</span>
+      </button>
 
+      <button class="header-btn" onclick="backToHomepage()" title="Back to Homepage">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        <span>Home</span>
+      </button>
+
+      <button class="header-btn" onclick="openRulesSettings()" title="Rules & Custom Prompts">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+        </svg>
+        <span>Rules</span>
+      </button>
+    </div>
+  </div>
   <div id="aiUnavailable" class="ai-disabled-note" style="display:none">
-    Der Autoren-Check ist noch nicht konfiguriert (Gemini API Key fehlt). Bitte einen Admin ?ber das TermSearch-Portal kontaktieren.
+    Author Check is not configured yet (Gemini API Key missing). Please contact an admin.
   </div>
-
   <div id="mainWrap" style="display:none">
+    <div class="control-row" style="margin-bottom:8px;">
+      <label style="margin-right:10px;">Scope</label>
+      <div style="display:flex; gap:12px; align-items:center;">
+        <label style="cursor:pointer; font-size:12px; font-weight:normal; text-transform:none; color:var(--ink);">
+          <input type="radio" name="checkScope" value="full" checked style="margin-right:4px;"> Entire Document
+        </label>
+        <label style="cursor:pointer; font-size:12px; font-weight:normal; text-transform:none; color:var(--ink);">
+          <input type="radio" name="checkScope" value="selection" style="margin-right:4px;"> Selection Only
+        </label>
+      </div>
+    </div>
     <div class="control-row">
-      <label>Sprache</label>
+      <label>Language</label>
       <select id="lang-select">
-        <option value="de" selected>Deutsch</option>
+        <option value="de" selected>German</option>
         <option value="en">English</option>
-        <option value="fr">Fran?ais</option>
-        <option value="es">Espa?ol</option>
-        <option value="it">Italiano</option>
+        <option value="es">Spanish</option>
+        <option value="sv">Swedish</option>
+        <option value="pt">Portuguese</option>
+        <option value="ru">Russian</option>
+        <option value="it">Italian</option>
+        <option value="fr">French</option>
+        <option value="nl">Dutch</option>
+        <option value="hu">Hungarian</option>
+        <option value="sk">Slovak</option>
+        <option value="hr">Croatian</option>
+        <option value="tr">Turkish</option>
+        <option value="pl">Polish</option>
+        <option value="fi">Finnish</option>
+        <option value="sr">Serbian</option>
+        <option value="ar">Arabic</option>
+        <option value="bg">Bulgarian</option>
+        <option value="el">Greek</option>
+        <option value="ko">Korean</option>
+        <option value="da">Danish</option>
+        <option value="ja">Japanese</option>
+        <option value="vi">Vietnamese</option>
+        <option value="zh">Chinese</option>
+        <option value="lv">Latvian</option>
+        <option value="cs">Czech</option>
+        <option value="uk">Ukrainian</option>
+        <option value="ro">Romanian</option>
+        <option value="et">Estonian</option>
+        <option value="sl">Slovenian</option>
+        <option value="nb">Norwegian</option>
       </select>
     </div>
-
     <button class="btn-check" id="checkBtn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-      Dokument pr?fen
+      Check Document
     </button>
-
     <div id="resultsWrap" aria-live="polite"></div>
   </div>
 </div>
 
-<!-- SETTINGS GEAR -->
-<button id="settingsGear" onclick="openRulesSettings()" title="Schreibregeln anpassen">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-</button>
-
-<!-- MODAL F?R REGELN -->
 <div class="modal-bg" id="rulesModal">
   <div class="modal">
-    <div class="modal-head">
-      <h2>Schreibregeln</h2>
-      <button class="modal-close" onclick="closeRulesSettings()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="modal-head" style="display:flex; justify-content:space-between; align-items:center; padding:14px; border-bottom:1px solid var(--gray-150);">
+      <h2>Rules & Custom Prompts</h2>
+      <button class="modal-close" onclick="closeRulesSettings()" title="Close Popup" style="background:none; border:none; cursor:pointer; padding:6px; color:var(--gray-600); display:flex; align-items:center; justify-content:center;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
     </div>
     <div class="modal-body" id="rulesModalBody">
-      <div class="loading-state"><div class="loading-text">Lade Regeln...</div></div>
+      <div class="loading-state"><div class="loading-text">Loading rules...</div></div>
     </div>
     <div class="modal-foot">
-      <button class="btn-check" style="margin:0; padding:8px;" onclick="saveRulesSettings()">Speichern</button>
+      <div style="display:flex; gap:6px;">
+        <button class="btn-mini ghost" style="padding:6px 10px;" onclick="exportRulesToDrive()" title="Export active rules to Google Drive JSON">JSON Export</button>
+        <label class="btn-mini ghost" style="padding:6px 10px; cursor:pointer;" title="Upload JSON rule file">
+          JSON Import
+          <input type="file" id="importRulesInput" accept=".json" style="display:none" onchange="importRulesFile(event)">
+        </label>
+      </div>
+      <button class="btn-check" style="margin:0; padding:8px 16px; width:auto;" onclick="saveRulesSettings()">Save Settings</button>
     </div>
   </div>
 </div>
-
 <div id="toast"></div>
-
 <script>
 var STATUS_MSGS = [
-  "Text wird extrahiert...",
-  "Terminologie-Glossar wird geladen...",
-  "Gemini pr?ft den Text...",
-  "Grammatik wird analysiert...",
-  "Fachbegriffe werden abgeglichen...",
-  "Ergebnisse werden zusammengestellt...",
-  "Fast fertig..."
+  "Extracting text...",
+  "Loading terminology glossary...",
+  "Gemini is analyzing text...",
+  "Checking grammar & spelling...",
+  "Applying style rules...",
+  "Compiling results...",
+  "Almost ready..."
 ];
 var _loadingInterval = null;
 var _currentIssues = [];
@@ -232,6 +325,12 @@ document.addEventListener('DOMContentLoaded', function(){
   google.script.run.withSuccessHandler(function(ctx){
     document.getElementById('aiUnavailable').style.display = ctx.aiEnabled ? 'none' : 'block';
     document.getElementById('mainWrap').style.display = ctx.aiEnabled ? 'block' : 'none';
+    
+    // Wenn als reine Rules-Ansicht aufgerufen, verstecke den Check-Bereich und ?ffne direkt das Rules-UI
+    if (ctx.isRulesOnly) {
+      document.getElementById('app').style.display = 'none';
+      initRulesModalUI();
+    }
   }).apiGetContext();
 });
 
@@ -239,6 +338,7 @@ document.getElementById('checkBtn').addEventListener('click', runCheck);
 
 function runCheck(){
   var lang = document.getElementById('lang-select').value;
+  var scope = document.querySelector('input[name="checkScope"]:checked').value;
   var btn = document.getElementById('checkBtn');
   var $rw = document.getElementById('resultsWrap');
   btn.disabled = true;
@@ -252,9 +352,34 @@ function runCheck(){
     .withFailureHandler(function(err){
       btn.disabled = false;
       stopLoading();
-      showState($rw, 'error', 'Pr?fung fehlgeschlagen', (err && err.message) ? err.message : String(err));
+      showState($rw, 'error', 'Check Failed', (err && err.message) ? err.message : String(err));
     })
-    .apiRunAuthorCheck(lang);
+    .apiRunAuthorCheck(lang, scope);
+}
+
+function exportAuditReport(){
+  if (!_currentIssues || !_currentIssues.length) {
+    showToast('No issues to export.');
+    return;
+  }
+  showToast('Generating Audit Report...');
+  google.script.run
+    .withSuccessHandler(function(url){
+      showToast('Opening Audit Report...');
+      
+      // Automatisches ?ffnen im neuen Tab
+      var a = document.createElement('a');
+      a.href = url;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    })
+    .withFailureHandler(function(err){
+      showToast('Export error: ' + (err.message || err));
+    })
+    .apiExportAuditReport(_currentIssues);
 }
 
 function startLoading(wrap){
@@ -267,32 +392,35 @@ function startLoading(wrap){
   render();
   _loadingInterval = setInterval(render, 1300);
 }
+
 function stopLoading(){ if (_loadingInterval) { clearInterval(_loadingInterval); _loadingInterval = null; } }
 
 function renderIssues(wrap, res){
   _currentIssues = res.issues || [];
   if (!_currentIssues.length){
-    showState(wrap, 'empty', 'Keine Fehler gefunden', 'Grammatik, Stil und Terminologie sehen f?r die gepr?fte Sprache sauber aus.');
+    showState(wrap, 'empty', 'No issues found', 'Grammar, style, and terminology look clean for the selected language.');
     return;
   }
-
   var summary = '<div class="summary-bar">'+
-      '<span><b>'+_currentIssues.length+'</b> Fund'+(_currentIssues.length!==1?'e':'')+'</span>'+
-      '<button class="btn-apply-all" id="applyAllBtn" onclick="applyAll()">Alle anwenden</button>'+
+      '<span><b>'+_currentIssues.length+'</b> issue'+(_currentIssues.length!==1?'s':'')+'</span>'+
+      '<div class="bulk-actions">'+
+        '<button class="btn-bulk" onclick="replaceAll()">Replace All</button>'+
+        '<button class="btn-bulk" onclick="noteAll()">Note All</button>'+
+        '<button class="btn-bulk" onclick="ignoreAll()">Ignore All</button>'+
+        '<button class="btn-bulk" style="background:var(--yellow); border-color:var(--yellow);" onclick="exportAuditReport()">Report</button>'+
+      '</div>'+
     '</div>';
-
   var cards = _currentIssues.map(function(issue, i){ return renderIssueCard(issue, i); }).join('');
   wrap.innerHTML = summary + cards;
 }
 
 function renderIssueCard(issue, idx){
-  var label = issue.type === 'terminology' ? 'Terminologie' : (issue.type === 'style' ? 'Stil/Regel' : 'Grammatik');
+  var label = issue.type === 'terminology' ? 'Terminology' : (issue.type === 'style' ? 'Style / Rule' : 'Grammar');
   var delay = Math.min(idx * 30, 200);
-
   return '<div class="issue-card" id="'+issue.id+'" style="animation-delay:'+delay+'ms">'+
     '<div class="issue-head">'+
       '<span class="type-badge '+issue.type+'">'+label+'</span>'+
-      '<button class="issue-dismiss" title="Ignorieren" onclick="dismissIssue(\''+issue.id+'\')">'+
+      '<button class="issue-dismiss" title="Dismiss" onclick="dismissIssue(\''+issue.id+'\')">'+
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M18 6L6 18"/></svg>'+
       '</button>'+
     '</div>'+
@@ -300,10 +428,10 @@ function renderIssueCard(issue, idx){
       '<div class="diff-line"><span class="diff-original">'+esc(issue.original)+'</span><span class="diff-arrow">?</span><span class="diff-suggestion">'+esc(issue.suggestion)+'</span></div>'+
       '<div class="issue-explanation">'+esc(issue.explanation||'')+'</div>'+
       '<div class="issue-actions">'+
-        '<button class="btn-mini primary" onclick="applyIssue(\''+issue.id+'\')">'+
-          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg> Anwenden'+
-        '</button>'+
-        '<button class="btn-mini ghost" onclick="dismissIssue(\''+issue.id+'\')">Ignorieren</button>'+
+        '<button class="btn-mini primary" title="Replace directly" onclick="applyIssue(\''+issue.id+'\')">Replace</button>'+
+        '<button class="btn-mini ghost" title="Jump to text" onclick="jumpToIssue(\''+issue.id+'\')">Jump</button>'+
+        '<button class="btn-mini ghost" title="Add as note/comment" onclick="commentIssue(\''+issue.id+'\')">Note</button>'+
+        '<button class="btn-mini ghost" title="Dismiss issue" onclick="dismissIssue(\''+issue.id+'\')">Ignore</button>'+
       '</div>'+
     '</div>'+
   '</div>';
@@ -314,19 +442,51 @@ function applyIssue(id){
   if (!issue) return;
   var card = document.getElementById(id);
   var actions = card.querySelector('.issue-actions');
-  actions.innerHTML = '<span style="font-size:11px;color:#9A9A9A;">Wird angewendet...</span>';
-
+  actions.innerHTML = '<span style="font-size:11px;color:#9A9A9A;">Replacing...</span>';
   google.script.run
     .withSuccessHandler(function(r){
       card.classList.add('applied');
-      actions.innerHTML = '<span class="applied-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg> Angewendet ('+r.count+'x)</span>';
-      showToast('Korrektur ?bernommen');
+      actions.innerHTML = '<span class="applied-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg> Replaced ('+r.count+'x)</span>';
+      showToast('Correction applied');
     })
     .withFailureHandler(function(err){
-      actions.innerHTML = '<button class="btn-mini primary" onclick="applyIssue(\''+id+'\')">Erneut versuchen</button><button class="btn-mini ghost" onclick="dismissIssue(\''+id+'\')">Ignorieren</button>';
-      showToast('Fehler: ' + ((err && err.message) ? err.message : String(err)));
+      actions.innerHTML = '<button class="btn-mini primary" onclick="applyIssue(\''+id+'\')">Retry</button><button class="btn-mini ghost" onclick="dismissIssue(\''+id+'\')">Ignore</button>';
+      showToast('Error: ' + ((err && err.message) ? err.message : String(err)));
     })
     .apiApplyAuthorCheckFix(issue.original, issue.suggestion);
+}
+
+function jumpToIssue(id) {
+  var issue = _currentIssues.find(function(i){ return i.id === id; });
+  if (!issue) return;
+  showToast('Jumping to text...');
+  google.script.run
+    .withSuccessHandler(function(found) {
+      if (!found) showToast('Text location not found.');
+    })
+    .withFailureHandler(function(err){ showToast('Error: ' + err.message); })
+    .apiJumpToIssue(issue.original);
+}
+
+function commentIssue(id) {
+  var issue = _currentIssues.find(function(i){ return i.id === id; });
+  if (!issue) return;
+  var card = document.getElementById(id);
+  var actions = card.querySelector('.issue-actions');
+  actions.innerHTML = '<span style="font-size:11px;color:#9A9A9A;">Adding note...</span>';
+  
+  google.script.run
+    .withSuccessHandler(function(found) {
+      if (found) {
+        card.classList.add('applied');
+        actions.innerHTML = '<span class="applied-tag">Note Added</span>';
+        showToast('Note inserted');
+      } else {
+        actions.innerHTML = '<span style="font-size:11px;color:#D32F2F;">Text not found</span>';
+      }
+    })
+    .withFailureHandler(function(err){ showToast('Error: ' + err.message); })
+    .apiCommentIssue(issue.original, issue.suggestion, issue.explanation);
 }
 
 function dismissIssue(id){
@@ -334,18 +494,18 @@ function dismissIssue(id){
   if (card) card.remove();
   _currentIssues = _currentIssues.filter(function(i){ return i.id !== id; });
   if (!_currentIssues.length) {
-    showState(document.getElementById('resultsWrap'), 'empty', 'Keine offenen Funde mehr', 'Alle Treffer wurden angewendet oder ignoriert.');
+    showState(document.getElementById('resultsWrap'), 'empty', 'No open issues', 'All items have been processed or dismissed.');
   }
 }
 
-function applyAll(){
-  var btn = document.getElementById('applyAllBtn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Wende an...'; }
+/* ??? BULK ACTIONS ????????????????????????????????????????????????????????? */
+function replaceAll(){
   var pending = _currentIssues.slice();
+  if (!pending.length) return;
+  showToast('Replacing all...');
   function next(i){
     if (i >= pending.length) {
-      if (btn) { btn.disabled = false; btn.textContent = 'Alle anwenden'; }
-      showToast('Alle Korrekturen ?bernommen');
+      showToast('All replacements applied');
       return;
     }
     var issue = pending[i];
@@ -355,13 +515,47 @@ function applyAll(){
       .withSuccessHandler(function(r){
         card.classList.add('applied');
         var actions = card.querySelector('.issue-actions');
-        if (actions) actions.innerHTML = '<span class="applied-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg> Angewendet</span>';
+        if (actions) actions.innerHTML = '<span class="applied-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg> Replaced</span>';
         next(i+1);
       })
       .withFailureHandler(function(){ next(i+1); })
       .apiApplyAuthorCheckFix(issue.original, issue.suggestion);
   }
   next(0);
+}
+
+function noteAll(){
+  var pending = _currentIssues.slice();
+  if (!pending.length) return;
+  showToast('Adding notes for all...');
+  function next(i){
+    if (i >= pending.length) {
+      showToast('All notes inserted');
+      return;
+    }
+    var issue = pending[i];
+    var card = document.getElementById(issue.id);
+    if (!card) { next(i+1); return; }
+    google.script.run
+      .withSuccessHandler(function(found){
+        if (found) {
+          card.classList.add('applied');
+          var actions = card.querySelector('.issue-actions');
+          if (actions) actions.innerHTML = '<span class="applied-tag">Note Added</span>';
+        }
+        next(i+1);
+      })
+      .withFailureHandler(function(){ next(i+1); })
+      .apiCommentIssue(issue.original, issue.suggestion, issue.explanation);
+  }
+  next(0);
+}
+
+function ignoreAll(){
+  var cards = document.querySelectorAll('.issue-card');
+  cards.forEach(function(c){ c.remove(); });
+  _currentIssues = [];
+  showState(document.getElementById('resultsWrap'), 'empty', 'All items ignored', 'Cleared all detected issues.');
 }
 
 function showState(wrap, type, title, sub){
@@ -382,57 +576,90 @@ function showToast(msg){
 
 function esc(str){ if (!str) return ''; return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-// ??? LOGIK F?R DAS REGEL-MODAL ??????????????????????????????????????????
-
+/* ??? RULES SETTINGS MODAL ?????????????????????????????????????????????????? */
 function openRulesSettings() {
+  // Ruft das gro?e Popup im Backend auf, falls wir uns in der Seitenleiste befinden
+  google.script.run.apiOpenRulesModal();
+}
+
+function closeRulesSettings() {
+  var modalEl = document.getElementById('rulesModal');
+  if (modalEl) modalEl.classList.remove('open');
+  // Schlie?t den Modal-Dialog in Google Docs/Sheets/Slides
+  google.script.host.close();
+}
+
+// Wird beim Initialisieren des Modals aufgerufen
+function initRulesModalUI() {
   document.getElementById('rulesModal').classList.add('open');
-  document.getElementById('rulesModalBody').innerHTML = '<div class="loading-state"><div class="loading-text">Lade Regeln...</div></div>';
-  
+  document.getElementById('rulesModalBody').innerHTML = '<div class="loading-state"><div class="loading-text">Loading rules...</div></div>';
   google.script.run
     .withSuccessHandler(function(rules) {
       _currentRulesData = rules;
       renderRulesUI(rules);
     })
     .withFailureHandler(function(err) {
-      document.getElementById('rulesModalBody').innerHTML = '<div style="color:red; text-align:center; padding:20px;">Fehler: '+err.message+'</div>';
+      document.getElementById('rulesModalBody').innerHTML = '<div style="color:red; text-align:center; padding:20px;">Error: '+err.message+'</div>';
     })
     .apiGetRulesConfig();
-}
-
-function closeRulesSettings() {
-  document.getElementById('rulesModal').classList.remove('open');
 }
 
 function renderRulesUI(rules) {
   var body = document.getElementById('rulesModalBody');
   if (!rules || rules.length === 0) {
-    body.innerHTML = '<div style="text-align:center; padding:20px; color:#767676;">Keine Regeln konfiguriert.</div>';
+    body.innerHTML = '<div style="text-align:center; padding:20px; color:#767676;">No rules configured.</div>';
     return;
   }
 
-  // Gruppiere nach Typ (Style, Terminology, etc.)
+  var existingTypes = {};
+  rules.forEach(function(r) { if(r.Type) existingTypes[r.Type] = true; });
+  var typeOptionsHtml = Object.keys(existingTypes).map(function(t) {
+    return '<option value="' + esc(t) + '">' + esc(t) + '</option>';
+  }).join('');
+
+  var topAddHeader = '<div style="margin-bottom:12px; padding:10px; background:var(--gray-50); border:1px solid var(--gray-200);">' +
+    '<button class="btn-mini primary" style="width:100%; font-weight:bold;" onclick="toggleAddCustomRuleForm()">+ Create New Rule / AI Prompt</button>' +
+    '<div id="addCustomRuleForm" style="display:none; margin-top:10px; border-top:1px solid var(--gray-200); padding-top:10px;">' +
+      
+      '<label style="font-size:10px; font-weight:bold; color:var(--gray-500);">CATEGORY / DROPDOWN</label>' +
+      '<select id="newRuleGroupSelect" onchange="onCategorySelectChange(this)" style="width:100%; margin-bottom:6px; padding:5px; font-size:11px; border:1px solid var(--gray-300);">' +
+        '<option value="">-- Select Existing Group --</option>' +
+        typeOptionsHtml +
+        '<option value="__NEW__">+ Create New Group/Dropdown...</option>' +
+      '</select>' +
+      '<input type="text" id="newRuleCustomGroup" placeholder="New Group Name (e.g., Compliance, Greenwashing)" style="display:none; width:100%; margin-bottom:6px; padding:5px; font-size:11px;">' +
+
+      '<label style="font-size:10px; font-weight:bold; color:var(--gray-500);">TYPE</label>' +
+      '<select id="newRuleKind" style="width:100%; margin-bottom:6px; padding:5px; font-size:11px; border:1px solid var(--gray-300);">' +
+        '<option value="PROMPT" selected>AI Prompt (Contextual Check)</option>' +
+        '<option value="RULE">Strict Rule (Instruction / Replacement)</option>' +
+      '</select>' +
+
+      '<input type="text" id="newRuleName" placeholder="Title (e.g., Greenwashing Check)" style="width:100%; margin-bottom:6px; padding:5px; font-size:11px;">' +
+      '<input type="text" id="newRuleDesc" placeholder="Short description for AI" style="width:100%; margin-bottom:6px; padding:5px; font-size:11px;">' +
+      '<textarea id="newRulePrompt" placeholder="Detailed AI Prompt instruction..." style="width:100%; height:55px; margin-bottom:6px; padding:5px; font-size:11px; font-family:inherit;"></textarea>' +
+      
+      '<button class="btn-mini primary" style="width:100%;" onclick="addNewCustomRule()">Add Rule</button>' +
+    '</div>' +
+  '</div>';
+
   var groups = {};
   rules.forEach(function(r) {
     if (!groups[r.Type]) groups[r.Type] = [];
     groups[r.Type].push(r);
   });
-
+  
   var html = '';
   Object.keys(groups).sort().forEach(function(type) {
-    
-    // NEU: Ausklappbares Design (Klick auf den Header ?ffnet den Body)
     html += '<div class="rule-group">';
     html +=   '<div class="rule-group-header" onclick="this.parentElement.classList.toggle(\'expanded\')">';
     html +=     '<h3>' + esc(type) + '</h3>';
     html +=     '<span class="rule-group-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></span>';
     html +=   '</div>';
     html +=   '<div class="rule-group-body">';
-    
-    groups[type].forEach(function(r, idx) {
+    groups[type].forEach(function(r) {
       var checked = r.IsEnabled ? 'checked' : '';
       var inputHtml = '';
-      
-      // Falls Parameter ausw?hlbar sind
       if (r.IsConfigurable && r.AllowedParameterValues && r.AllowedParameterValues.length) {
         var options = r.AllowedParameterValues.map(function(v) {
           var sel = (String(v) === String(r.Parameter)) ? 'selected' : '';
@@ -440,17 +667,64 @@ function renderRulesUI(rules) {
         }).join('');
         inputHtml = '<select data-name="'+r.Name+'">' + options + '</select>';
       }
-
       html += '<div class="rule-item">' +
               '<label><input type="checkbox" data-name="'+r.Name+'" '+checked+'> ' + esc(r.Description) + '</label>' +
               inputHtml +
               '</div>';
     });
-    
     html += '</div></div>';
   });
 
-  body.innerHTML = html;
+  body.innerHTML = topAddHeader + html;
+}
+
+function toggleAddCustomRuleForm() {
+  var form = document.getElementById('addCustomRuleForm');
+  if (form) form.style.display = (form.style.display === 'none') ? 'block' : 'none';
+}
+
+function onCategorySelectChange(selectEl) {
+  var customInput = document.getElementById('newRuleCustomGroup');
+  if (selectEl.value === '__NEW__') {
+    customInput.style.display = 'block';
+    customInput.focus();
+  } else {
+    customInput.style.display = 'none';
+  }
+}
+
+function addNewCustomRule() {
+  var groupSelect = document.getElementById('newRuleGroupSelect').value;
+  var customGroup = document.getElementById('newRuleCustomGroup').value.trim();
+  var kind = document.getElementById('newRuleKind').value;
+  var name = document.getElementById('newRuleName').value.trim();
+  var desc = document.getElementById('newRuleDesc').value.trim();
+  var prompt = document.getElementById('newRulePrompt').value.trim();
+  
+  var finalGroup = (groupSelect === '__NEW__') ? customGroup : groupSelect;
+  if (!finalGroup) {
+    showToast('Please select or create a group!');
+    return;
+  }
+  if (!name || !desc) {
+    showToast('Please enter title and description!');
+    return;
+  }
+
+  var newRule = {
+    "Name": "CUSTOM_" + name.toUpperCase().replace(/[^A-Z0-9]/g, '_'),
+    "Description": desc,
+    "Type": finalGroup,
+    "RuleKind": kind,
+    "CustomPrompt": prompt || desc,
+    "IsEnabled": true,
+    "IsConfigurable": false,
+    "Parameter": "-1"
+  };
+
+  _currentRulesData.push(newRule);
+  renderRulesUI(_currentRulesData);
+  showToast('New rule added! Click "Save Settings".');
 }
 
 function saveRulesSettings() {
@@ -458,30 +732,86 @@ function saveRulesSettings() {
   var updatedRules = _currentRulesData.map(function(r) {
     var cb = body.querySelector('input[type="checkbox"][data-name="'+r.Name+'"]');
     var sel = body.querySelector('select[data-name="'+r.Name+'"]');
-    
     if (cb) r.IsEnabled = cb.checked;
     if (sel) r.Parameter = sel.value;
     return r;
   });
-
   var btn = document.querySelector('#rulesModal .modal-foot .btn-check');
-  btn.innerText = 'Speichere...';
+  btn.innerText = 'Saving...';
   btn.disabled = true;
-
   google.script.run
     .withSuccessHandler(function() {
-      btn.innerText = 'Speichern';
+      btn.innerText = 'Save Settings';
       btn.disabled = false;
       closeRulesSettings();
-      showToast('Schreibregeln gespeichert.');
+      showToast('Settings & Drive JSON saved.');
     })
     .withFailureHandler(function(err) {
-      btn.innerText = 'Speichern';
+      btn.innerText = 'Save Settings';
       btn.disabled = false;
-      showToast('Fehler beim Speichern: ' + err.message);
+      showToast('Save error: ' + err.message);
     })
     .apiSaveRulesConfig(updatedRules);
 }
+
+function exportRulesToDrive() {
+  showToast('Exporting to Google Drive...');
+  google.script.run
+    .withSuccessHandler(function() {
+      showToast('Updated "TermCheck Rules" folder!');
+    })
+    .withFailureHandler(function(err) {
+      showToast('Export error: ' + err.message);
+    })
+    .apiExportRulesToDrive(_currentRulesData);
+}
+
+function importRulesFile(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var imported = JSON.parse(e.target.result);
+      if (!Array.isArray(imported)) imported = [imported];
+      
+      imported.forEach(function(imp) {
+        var idx = _currentRulesData.findIndex(function(r) { return r.Name === imp.Name; });
+        if (idx !== -1) {
+          _currentRulesData[idx] = imp;
+        } else {
+          _currentRulesData.push(imp);
+        }
+      });
+      renderRulesUI(_currentRulesData);
+      showToast('Rules imported successfully!');
+    } catch(err) {
+      showToast('Invalid JSON file!');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function toggleViewMode() {
+  showToast('Switching view mode...');
+  google.script.run
+    .withSuccessHandler(function(res) {
+      // Wenn vom Modal in die Seitenleiste gewechselt wurde, schlie?en wir das Dialogfenster automatisch
+      if (res && res.newMode === 'SIDEBAR') {
+        google.script.host.close();
+      }
+    })
+    .apiToggleAuthorCheckView();
+}
+
+function backToHomepage() {
+  google.script.run
+    .withSuccessHandler(function() {
+      google.script.host.close();
+    })
+    .apiBackToHomepage();
+}
+
 </script>
 </body>
 </html>
