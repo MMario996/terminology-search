@@ -1,27 +1,23 @@
 // ============================================================================
-// WORKSPACE ADD-ON HOMEPAGE (Pflicht-Einstiegspunkt laut addOns-Manifest)
-// Wird angezeigt, wenn der User das Add-on-Icon in der rechten Seitenleiste
-// von Docs/Sheets/Slides anklickt, BEVOR er ein Dokument ?ffnet bzw. als
-// Fallback-Ansicht. Das eigentliche Arbeiten l?uft weiterhin ?ber das Men?
-// ?K?rcher TermCheck" (onOpen) und die Sidebars (showSidebar / showAuthorCheckSidebar).
+// WORKSPACE ADD-ON HOMEPAGE (Default entry point)
 // ============================================================================
 function onHomepage(e) {
   var card = CardService.newCardBuilder();
 
   card.setHeader(CardService.newCardHeader()
     .setTitle('K?rcher TermCheck')
-    .setSubtitle('Terminologie & Autoren-Check'));
+    .setSubtitle('Terminology Search & Authoring-Tool Check'));
 
   var section = CardService.newCardSection()
     .addWidget(CardService.newTextParagraph()
-      .setText('?ffne das Men? <b>?K?rcher TermCheck"</b> oben im Dokument, um die Terminologie-Suche oder den Autoren-Check zu starten.'));
+      .setText('Open the <b>Terminology Search</b> to browse for terminology or <b>Author Check</b> to check your document.'));
 
   section.addWidget(CardService.newTextButton()
-    .setText('Terminologie-Suche ?ffnen')
+    .setText('Open Terminology Search')
     .setOnClickAction(CardService.newAction().setFunctionName('showSidebar')));
 
   section.addWidget(CardService.newTextButton()
-    .setText('Autoren-Check ?ffnen')
+    .setText('Open Author Check')
     .setOnClickAction(CardService.newAction().setFunctionName('showAuthorCheckSidebar')));
 
   card.addSection(section);
