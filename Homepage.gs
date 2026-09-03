@@ -23,3 +23,9 @@ function onHomepage(e) {
   card.addSection(section);
   return card.build();
 }
+function apiShowHomeChooser(e) {
+  var ui = HtmlService.createHtmlOutputFromFile('HomeChooser')
+    .setTitle('K?rcher TermCheck')
+    .setWidth(300);
+  _getUiSafe_(e).showSidebar(ui);
+}
