@@ -193,13 +193,32 @@ button, select, input, textarea{ font-family:inherit; }
 .rule-item input[type="checkbox"] { cursor:pointer; }
 .rule-item select { font-size:11px; padding:2px 4px; border:1px solid var(--gray-300); background:var(--white); margin-left:10px;}
 
-/* Nur im gro?en Popup (Rules & Custom Prompts) Schrift 2pt gr??er */
-body.popup-mode { font-size: 19px; }
-body.popup-mode .modal-head h2 { font-size: 16px; }
-body.popup-mode .rule-group-header h3 { font-size: 14px; }
-body.popup-mode .rule-item label { font-size: 13px; }
-body.popup-mode .rule-item select { font-size: 13px; }
-body.popup-mode .btn-mini { font-size: 14px; }
+.spinner {
+  display:inline-block; width:14px; height:14px; border:2px solid var(--gray-300);
+  border-top-color:var(--ink); border-radius:50%; animation:spin .7s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+
+.modal-help-btn { background:none; border:none; cursor:pointer; padding:6px; color:var(--gray-600); display:flex; align-items:center; justify-content:center; }
+.modal-help-btn:hover { color:var(--ink); }
+.help-overlay { display:none; position:absolute; inset:0; background:rgba(58,58,58,.55); z-index:250; align-items:center; justify-content:center; padding:20px; }
+.help-overlay.open { display:flex; }
+.help-box { background:var(--white); max-width:480px; width:100%; padding:22px; box-shadow:0 10px 25px rgba(0,0,0,.2); }
+.help-box h3 { font-family:var(--ff-head); font-size:16px; text-transform:uppercase; margin-bottom:12px; }
+.help-list { list-style:disc; padding-left:18px; margin-bottom:14px; }
+.help-list li { font-size:14px; line-height:1.5; margin-bottom:6px; color:var(--gray-600); }
+.help-checkbox { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--gray-600); cursor:pointer; }
+
+/* Popup (Rules & Custom Prompts): Schrift insgesamt gr??er als in der Seitenleiste */
+body.popup-mode { font-size: 21px; }
+body.popup-mode .modal-head h2 { font-size: 18px; }
+body.popup-mode .rule-group-header h3 { font-size: 16px; }
+body.popup-mode .rule-item label { font-size: 15px; }
+body.popup-mode .rule-item select { font-size: 15px; }
+body.popup-mode .btn-mini { font-size: 16px; }
+body.popup-mode #newRulePrompt { font-size: 15px !important; }
+.modal-foot .btn-mini { white-space: nowrap; flex: 0 0 auto; padding: 8px 14px; }
+body.popup-mode .modal-foot .btn-mini { font-size: 16px; padding: 10px 18px; }
 </style>
 </head>
 <body>
@@ -217,10 +236,11 @@ body.popup-mode .btn-mini { font-size: 14px; }
         <span>Home</span>
       </button>
 
-      <button class="header-btn" onclick="openRulesSettings()" title="Rules & Custom Prompts">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <button class="header-btn" id="rulesBtn" onclick="openRulesSettings()" title="Rules & Custom Prompts">
+        <svg id="rulesBtnIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
         </svg>
+        <span class="spinner" id="rulesBtnSpinner" style="display:none;"></span>
         <span>Rules</span>
       </button>
     </div>
@@ -288,9 +308,18 @@ body.popup-mode .btn-mini { font-size: 14px; }
   <div class="modal">
     <div class="modal-head" style="display:flex; justify-content:space-between; align-items:center; padding:14px; border-bottom:1px solid var(--gray-150);">
       <h2>Rules & Custom Prompts</h2>
-      <button class="modal-close" onclick="closeRulesSettings()" title="Close Popup" style="background:none; border:none; cursor:pointer; padding:6px; color:var(--gray-600); display:flex; align-items:center; justify-content:center;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20"><path d="M6 6l12 12M18 6L6 18"/></svg>
-      </button>
+      <div style="display:flex; align-items:center; gap:2px;">
+        <button class="modal-help-btn" onclick="openRulesHelp()" title="Help / How it works">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 2-3 4"/>
+            <circle cx="12" cy="17" r="0.6" fill="currentColor" stroke="none"/>
+          </svg>
+        </button>
+        <button class="modal-close" onclick="closeRulesSettings()" title="Close Popup" style="background:none; border:none; cursor:pointer; padding:6px; color:var(--gray-600); display:flex; align-items:center; justify-content:center;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
     </div>
     <div class="modal-body" id="rulesModalBody">
       <div class="loading-state"><div class="loading-text">Loading rules...</div></div>
@@ -305,18 +334,47 @@ body.popup-mode .btn-mini { font-size: 14px; }
       </div>
       <button class="btn-check" style="margin:0; padding:8px 16px; width:auto;" onclick="saveRulesSettings()">Save Settings</button>
     </div>
+
+    <div class="help-overlay" id="rulesHelpOverlay">
+      <div class="help-box" style="max-width:640px; max-height:80vh; overflow-y:auto;">
+        <h3>How Rules & Custom Prompts works</h3>
+        <ul class="help-list">
+          <li><b>+ Create New Rule / AI Prompt</b> creates a new rule or a custom AI prompt. Pick an existing category or create a new one, choose whether it's a strict "Rule" or a free-form "AI Prompt", give it a title and description, and (for AI Prompts) a detailed instruction that Gemini follows when checking a document.</li>
+          <li>The categories (Abbreviation, Grammar, ...) can be expanded. Each rule has a checkbox to turn it on or off. Only enabled rules are actually used the next time you run a check.</li>
+          <li><b>Save Settings</b> saves your changes permanently: it stores which rules are on/off for your account, and it writes the full rule set, including any custom rules, to a file called <b>active_rules.json</b> in a Google Drive folder named <b>"TermCheck Rules"</b> in your own Google Drive.</li>
+        </ul>
+        <h3 style="margin-top:16px;">Export, Import & sharing with a colleague</h3>
+        <ul class="help-list">
+          <li><b>JSON Export</b> writes your current rule set, exactly as shown right now in this popup, to that same <b>active_rules.json</b> file in the <b>"TermCheck Rules"</b> folder in your Drive. This folder is created automatically the first time you save or export, it is private to your own account, not shared automatically.</li>
+          <li><b>JSON Import</b> lets you pick a JSON file from your computer and load its rules into this popup. Rules with the same internal name overwrite the existing one, rules with a new name are added. Import only changes what you see here, nothing is saved yet at this point.</li>
+          <li>Important: an import only takes effect once you click <b>Save Settings</b> afterwards. If you close the popup without saving, the imported rules are discarded.</li>
+          <li><b>To share your rules with a colleague:</b>
+            <ol style="margin:6px 0 0 18px; padding:0;">
+              <li>Click <b>JSON Export</b> (or Save Settings) to make sure your Drive file is up to date.</li>
+              <li>Open Google Drive, find the <b>"TermCheck Rules"</b> folder in your My Drive, and either share the <b>active_rules.json</b> file directly with your colleague, or download it and send it however you like, e.g. email or Teams.</li>
+              <li>Your colleague opens their own Rules & Custom Prompts popup, clicks <b>JSON Import</b>, selects the file you sent, checks that it looks right, and clicks <b>Save Settings</b>. This saves it into their own account and their own Drive folder.</li>
+            </ol>
+          </li>
+          <li>This is a one-time snapshot, not a live sync. If you change your rules later, you need to export and share the file again for your colleague to get the update.</li>
+        </ul>
+        <label class="help-checkbox">
+          <input type="checkbox" id="rulesHelpDontShow">
+          Don't show this automatically next time
+        </label>
+        <button class="btn-check" style="margin-top:14px;" onclick="confirmRulesHelp()">Got it</button>
+      </div>
+    </div>
   </div>
 </div>
 <div id="toast"></div>
 <script>
 var STATUS_MSGS = [
-  "Extracting text...",
-  "Loading terminology glossary...",
-  "Gemini is analyzing text...",
-  "Checking grammar & spelling...",
-  "Applying style rules...",
-  "Compiling results...",
-  "Almost ready..."
+  "Juggling with commas and semicolons...",
+  "Cross-checking your terminology...",
+  "Comparing wording against the glossary...",
+  "Looking for grammar slip-ups...",
+  "Weighing your sentences against the style rules...",
+  "Double-checking the findings..."
 ];
 var _loadingInterval = null;
 var _currentIssues = [];
@@ -328,10 +386,13 @@ document.addEventListener('DOMContentLoaded', function(){
     document.getElementById('mainWrap').style.display = ctx.aiEnabled ? 'block' : 'none';
     
     // Wenn als reine Rules-Ansicht aufgerufen, verstecke den Check-Bereich und ?ffne direkt das Rules-UI
-    if (ctx.isRulesOnly) {
+      if (ctx.isRulesOnly) {
       document.getElementById('app').style.display = 'none';
       document.body.classList.add('popup-mode');
       initRulesModalUI();
+      if (!ctx.rulesHelpSeen) {
+        openRulesHelp();
+      }
     }
   }).apiGetContext();
 });
@@ -578,10 +639,39 @@ function showToast(msg){
 
 function esc(str){ if (!str) return ''; return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
+function openRulesHelp() {
+  document.getElementById('rulesHelpOverlay').classList.add('open');
+}
+
+function confirmRulesHelp() {
+  var dontShow = document.getElementById('rulesHelpDontShow').checked;
+  document.getElementById('rulesHelpOverlay').classList.remove('open');
+  if (dontShow) {
+    google.script.run.apiMarkRulesHelpSeen();
+  }
+}
+
 /* ??? RULES SETTINGS MODAL ?????????????????????????????????????????????????? */
 function openRulesSettings() {
+  var btn = document.getElementById('rulesBtn');
+  var icon = document.getElementById('rulesBtnIcon');
+  var spinner = document.getElementById('rulesBtnSpinner');
+  btn.disabled = true;
+  icon.style.display = 'none';
+  spinner.style.display = 'inline-block';
+
+  var resetBtn = function() {
+    btn.disabled = false;
+    icon.style.display = '';
+    spinner.style.display = 'none';
+  };
+  var timeoutId = setTimeout(resetBtn, 5000);
+
   // Ruft das gro?e Popup im Backend auf, falls wir uns in der Seitenleiste befinden
-  google.script.run.apiOpenRulesModal();
+  google.script.run
+    .withSuccessHandler(function(){ clearTimeout(timeoutId); resetBtn(); })
+    .withFailureHandler(function(err){ clearTimeout(timeoutId); resetBtn(); showToast('Error: ' + err.message); })
+    .apiOpenRulesModal();
 }
 
 function closeRulesSettings() {
@@ -807,11 +897,7 @@ function toggleViewMode() {
 }
 
 function backToHomepage() {
-  google.script.run
-    .withSuccessHandler(function() {
-      google.script.host.close();
-    })
-    .apiBackToHomepage();
+  google.script.run.apiShowHomeChooser();
 }
 
 </script>
