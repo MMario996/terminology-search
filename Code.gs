@@ -17,15 +17,19 @@ function doGet(e) {
 function apiGetContext() {
   var caller = getUserEmail_();
   var props = PropertiesService.getScriptProperties();
+  var userProps = PropertiesService.getUserProperties();
   var token  = (props.getProperty('PHRASE_API_TOKEN') || '').trim();
   var geminiKey = (props.getProperty('GEMINI_API_KEY') || '').trim();
   var role = getUserRole_(caller);
+  var isRulesOnly = userProps.getProperty('AUTHORCHECK_IS_RULES_ONLY') === 'true';
+
   return {
     email:           caller,
     role:            role,
     isAdmin:         role === 'ADMIN',
     phraseConnected: token.length > 10,
     aiEnabled:       geminiKey.length > 10,
+    isRulesOnly:     isRulesOnly,
     templates: {
       LLM: { uid: props.getProperty('TEMPLATE_LLM') || 'pNoERiZ1YTileyUe4Za1j6', name: '[AKW] Terminology check [MT+Review LLM]' },
       ALG: { uid: props.getProperty('TEMPLATE_ALG') || 'arpmvYCEAqGl0OmKV9f3s3', name: '[AKW] Terminology check [MT+Review ALG]' }
@@ -744,8 +748,8 @@ function onOpen(e) {
       menu = SlidesApp.getUi().createMenu('K?rcher TermCheck');
     }
     if (menu) {
-      menu.addItem('Terminologie-Suche ?ffnen', 'showSidebar')
-          .addItem('Autoren-Check ?ffnen', 'showAuthorCheckSidebar')
+      menu.addItem('Open Terminology Search', 'showSidebar')
+          .addItem('Open Author Check', 'showAuthorCheckSidebar')
           .addToUi();
     }
   } catch(err) {
@@ -763,29 +767,73 @@ function showSidebar() {
   else if (SlidesApp.getActivePresentation()) SlidesApp.getUi().showSidebar(ui);
 }
 
-function apiExtractTextFromCurrentApp() {
+function apiExtractTextFromCurrentApp(scope) {
   var text = "";
-  
+  var isSelection = (scope === 'selection');
+
   if (DocumentApp.getActiveDocument()) {
-    text = DocumentApp.getActiveDocument().getBody().getText();
+    var doc = DocumentApp.getActiveDocument();
+    if (isSelection) {
+      var selection = doc.getSelection();
+      if (selection) {
+        var elements = selection.getRangeElements();
+        elements.forEach(function(el) {
+          if (el.getElement().asText) {
+            var txt = el.getElement().asText().getText();
+            if (el.isPartial()) {
+              text += txt.substring(el.getStartOffset(), el.getEndOffsetInclusive() + 1) + " ";
+            } else {
+              text += txt + " ";
+            }
+          }
+        });
+      }
+    } else {
+      text = doc.getBody().getText();
+    }
   } 
   else if (SpreadsheetApp.getActiveSpreadsheet()) {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    var data = sheet.getDataRange().getValues();
-    // Alle Zeilen und Spalten zu einem gro?en Textblock zusammenf?gen
-    text = data.map(function(row) { return row.join(" "); }).join("\n");
+    if (isSelection) {
+      var range = sheet.getActiveRange();
+      if (range) {
+        var values = range.getValues();
+        text = values.map(function(row) { return row.join(" "); }).join("\n");
+      }
+    } else {
+      var data = sheet.getDataRange().getValues();
+      text = data.map(function(row) { return row.join(" "); }).join("\n");
+    }
   } 
   else if (SlidesApp.getActivePresentation()) {
-    var slides = SlidesApp.getActivePresentation().getSlides();
-    slides.forEach(function(slide) {
-      slide.getShapes().forEach(function(shape) {
-        if (shape.getShapeType() === SlidesApp.ShapeType.TEXT_BOX) {
-          text += shape.getText().asString() + "\n";
-        }
+    var pres = SlidesApp.getActivePresentation();
+    if (isSelection) {
+      var selection = pres.getSelection();
+      var pageRange = selection.getPageRange();
+      if (pageRange) {
+        var pages = pageRange.getPages();
+        pages.forEach(function(page) {
+          page.getShapes().forEach(function(shape) {
+            if (shape.getShapeType() === SlidesApp.ShapeType.TEXT_BOX) {
+              text += shape.getText().asString() + "\n";
+            }
+          });
+        });
+      }
+    } else {
+      var slides = pres.getSlides();
+      slides.forEach(function(slide) {
+        slide.getShapes().forEach(function(shape) {
+          if (shape.getShapeType() === SlidesApp.ShapeType.TEXT_BOX) {
+            text += shape.getText().asString() + "\n";
+          }
+        });
       });
-    });
+    }
   }
   
-  // Limitiere auf ca. 15.000 Zeichen, damit der KI-Prompt nicht platzt
+  if (text) {
+    text = text.replace(/&nbsp;/g, ' ').replace(/\u00A0/g, ' ');
+  }
   return text.substring(0, 15000); 
 }
