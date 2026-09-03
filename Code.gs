@@ -775,8 +775,10 @@ function apiExtractTextFromCurrentApp(scope) {
     var doc = DocumentApp.getActiveDocument();
     if (isSelection) {
       var selection = doc.getSelection();
+      Logger.log('apiExtractTextFromCurrentApp: selection=' + (selection ? 'vorhanden' : 'null'));
       if (selection) {
         var elements = selection.getRangeElements();
+        Logger.log('apiExtractTextFromCurrentApp: ' + elements.length + ' RangeElement(s) gefunden');
         elements.forEach(function(el) {
           if (el.getElement().asText) {
             var txt = el.getElement().asText().getText();
@@ -809,16 +811,37 @@ function apiExtractTextFromCurrentApp(scope) {
     var pres = SlidesApp.getActivePresentation();
     if (isSelection) {
       var selection = pres.getSelection();
-      var pageRange = selection.getPageRange();
-      if (pageRange) {
-        var pages = pageRange.getPages();
-        pages.forEach(function(page) {
-          page.getShapes().forEach(function(shape) {
-            if (shape.getShapeType() === SlidesApp.ShapeType.TEXT_BOX) {
-              text += shape.getText().asString() + "\n";
+      var selType = selection.getSelectionType();
+
+      if (selType === SlidesApp.SelectionType.TEXT) {
+        // Text innerhalb einer Textbox ist markiert (Cursor im Text oder Text hervorgehoben)
+        var textRange = selection.getTextRange();
+        if (textRange) {
+          text += textRange.asString() + "\n";
+        }
+      } else if (selType === SlidesApp.SelectionType.PAGE_ELEMENT) {
+        // Eine Form/Textbox ist als Objekt markiert (z.B. per Klick auf den Rahmen)
+        var pageElementRange = selection.getPageElementRange();
+        if (pageElementRange) {
+          pageElementRange.getPageElements().forEach(function(pe) {
+            if (pe.getPageElementType() === SlidesApp.PageElementType.SHAPE) {
+              text += pe.asShape().getText().asString() + "\n";
             }
           });
-        });
+        }
+      } else if (selType === SlidesApp.SelectionType.PAGE) {
+        // Ganze Folie(n) links im Filmstreifen markiert
+        var pageRange = selection.getPageRange();
+        if (pageRange) {
+          var pages = pageRange.getPages();
+          pages.forEach(function(page) {
+            page.getShapes().forEach(function(shape) {
+              if (shape.getShapeType() === SlidesApp.ShapeType.TEXT_BOX) {
+                text += shape.getText().asString() + "\n";
+              }
+            });
+          });
+        }
       }
     } else {
       var slides = pres.getSlides();
